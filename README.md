@@ -45,53 +45,7 @@ public class LouDong implements Serializable {
 		super();
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getCity() {
-		return city;
-	}
-
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	public String getRegion() {
-		return region;
-	}
-
-	public void setRegion(String region) {
-		this.region = region;
-	}
-
-	public String getLdNum() {
-		return ldNum;
-	}
-
-	public void setLdNum(String ldNum) {
-		this.ldNum = ldNum;
-	}
-
-	public String getUnitNum() {
-		return unitNum;
-	}
-
-	public void setUnitNum(String unitNum) {
-		this.unitNum = unitNum;
-	}
+	//省略get,set方法
 	
 	public final static String[] SHOW_FIELDS = new String[]{ "city", "region", "name", "ld_num" };
 	
