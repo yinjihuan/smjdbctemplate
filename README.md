@@ -55,7 +55,7 @@ public class LouDong implements Serializable {
 }
 
 ```
----
+
 ```
 @Service
 public class LdServiceImpl extends EntityService<LouDong> implements LdService {
@@ -127,8 +127,7 @@ public class LdServiceImpl extends EntityService<LouDong> implements LdService {
 }
 ```
 
----
-测试类
+# 测试类
 ```
 /**
  * 楼栋业务测试类
@@ -279,3 +278,26 @@ public class LdServiceTest extends TestBase {
 	}
 }
 ```
+
+# FAQ
+## 项目中怎么配置使用呢？
+首先你需要有jdbctemplate的包，然后再配置smjdbc的包
+如果是spring boot项目可以使用bean的方式配置
+```
+@Configuration
+public class BeanConfig {
+	
+	/**
+	 * JDBC
+	 * @return
+	 */
+	@Bean(autowire=Autowire.BY_NAME)
+	public CxytiandiJdbcTemplate cxytiandiJdbcTemplate() {
+		return new CxytiandiJdbcTemplate("com.fangjia.model.ld.po");
+	}
+	
+}
+```
+上面构造方法中传的com.fangjia.model.ld.po是你数据表对应的PO实体类所在的包路径，就放一个包下，不要放多个
+
+如果是用xml的方式，那就用<bean>标签配置即可。
