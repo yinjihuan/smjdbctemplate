@@ -300,4 +300,14 @@ public class BeanConfig {
 ```
 上面构造方法中传的com.fangjia.model.ld.po是你数据表对应的PO实体类所在的包路径，就放一个包下，不要放多个
 
-如果是用xml的方式，那就用<bean>标签配置即可。
+如果是用xml的方式，那就用&lt; bean>标签配置即可。
+
+## 除了继承EntityService还能用什么办法使用？
+大家完全可以直接注入JdbcTemplate来操作数据库，我这里只是对JdbcTemplate进行了扩展
+
+当然也可以直接注入扩展之后的CxytiandiJdbcTemplate来操作
+
+```
+@Autowired
+private CxytiandiJdbcTemplate jdbcTemplate;
+```
