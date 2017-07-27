@@ -14,6 +14,7 @@
 - 没有改变原始JdbcTemplate的功能
 - 增加了orm框架必备的操作对象来管理数据
 - 简单的数据库操作使用CxytiandiJdbcTemplate提高效率
+- 支持分布式主键ID的自动生成
 
 # 用法如下
 定义数据表对应的PO类,表名和字段名以注解中的value为准
@@ -310,6 +311,13 @@ public class BeanConfig {
 ```
 @Autowired
 private CxytiandiJdbcTemplate jdbcTemplate;
+```
+## 支持分布式主键ID的自动生成怎么使用？
+只需要在对应的注解字段上加上@AutoId注解即可，注意此字段的类型必须为String或者Long, 需要关闭数据库的自增功能
+```
+@AutoId
+@Field(value="id", desc="主键ID")
+private String id;
 ```
 
 # 作者
