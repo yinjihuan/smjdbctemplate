@@ -37,5 +37,12 @@
 			<artifactId>spring-context</artifactId>
 			<version>4.3.3.RELEASE</version>
 		</dependency>
+		
+		<!-- guava -->
+		<dependency>
+           <groupId>com.google.guava</groupId>
+           <artifactId>guava</artifactId>
+           <version>18.0</version>
+      		</dependency>
 	</dependencies>
 </project>

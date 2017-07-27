@@ -22,7 +22,12 @@ import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.util.Assert;
+
+import com.cxytiandi.jdbc.annotation.AutoId;
 import com.cxytiandi.jdbc.annotation.TableName;
+import com.cxytiandi.jdbc.keygen.DefaultKeyGenerator;
+import com.cxytiandi.jdbc.keygen.KeyGenerator;
+import com.cxytiandi.jdbc.keygen.KeyGeneratorFactory;
 import com.cxytiandi.jdbc.util.ArrayUtils;
 import com.cxytiandi.jdbc.util.BeanUtils;
 import com.cxytiandi.jdbc.util.ClassUtils;
@@ -38,6 +43,7 @@ import com.cxytiandi.jdbc.util.ReflectUtils;
 public class CxytiandiJdbcTemplate extends JdbcTemplate {
 	private IDBHelper dbHelper = new MySQLHelper();
 	private static final Logger logger = LoggerFactory.getLogger(CxytiandiJdbcTemplate.class);
+	private KeyGenerator keyGenerator = KeyGeneratorFactory.createKeyGenerator(DefaultKeyGenerator.class);
 	
 	public CxytiandiJdbcTemplate(String poPackage) {
 		try {
@@ -209,6 +215,7 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 	}
 	
 	private <T> Serializable doSave(Class<T> entityClass, Object entity, String[] fieldNames) {
+		setAutoId(entityClass, entity, fieldNames);
 		String[] paramPlaceHolders = new String[fieldNames.length];
 		Arrays.fill(paramPlaceHolders, 0, paramPlaceHolders.length, "?");
 		final StringBuilder sql = getSaveSql(entityClass, fieldNames, paramPlaceHolders);
@@ -251,7 +258,23 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 		}
 	}
 
+	private <T> void setAutoId(Class<T> entityClass, Object entity, String[] fieldNames) {
+		try {
+			Field field = ReflectUtils.getField(entityClass, fieldNames, AutoId.class);
+			if (field != null) {
+				if (field.getType().getSimpleName().equals("String")) {
+					ReflectUtils.callSetMethod(field.getName(), String.class, entity, keyGenerator.generateKey().toString());
+				} else {
+					ReflectUtils.callSetMethod(field.getName(), Long.class, entity, keyGenerator.generateKey());
+				}
+			}
+		} catch (NoSuchFieldException e) {
+			logger.error("设置分布式主键ID异常", e);
+		}
+	}
+
 	private <T> Object[] getSaveValues(Class<T> entityClass, Object entity, String[] fieldNames) {
+		setAutoId(entityClass, entity, fieldNames);
 		final Object[] values = new Object[fieldNames.length];
 		for(int i=0; i<fieldNames.length; i++) {
 			String fieldName = fieldNames[i];

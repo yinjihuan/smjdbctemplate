@@ -1,6 +1,7 @@
 package com.cxytiandi.jdbc.util;
 
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -106,7 +107,6 @@ public abstract class ReflectUtils {
 				}
 			}
 		}else{
-//			Field[] fs = entityClass.getDeclaredFields();
 			Field[] fs = BeanUtils.extractFieldsFromPOJO(entityClass);
 			for(int i=0; i<fs.length; i++){
 				Field f = fs[i];
@@ -117,6 +117,41 @@ public abstract class ReflectUtils {
 		}
 		return null;
 	}
+	
+	public static Field getField(Class<?> entityClass, String[] fieldNames, Class<? extends Annotation> annotationClass) throws NoSuchFieldException {
+		for (String fieldname : fieldNames) {
+			try{
+				Field f = entityClass.getDeclaredField(fieldname);
+				if(f != null && f.isAnnotationPresent(annotationClass)){
+					return f;
+				}
+			}catch(NoSuchFieldException e){
+				if(entityClass.getSuperclass() != null && entityClass.getSuperclass() != Object.class){
+					return getField(entityClass.getSuperclass(), fieldname, true);
+				}else{
+					return null;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public static Field getField(Class<?> entityClass, String fieldname, Class<? extends Annotation> annotationClass) throws NoSuchFieldException {
+		try{
+			Field f = entityClass.getDeclaredField(fieldname);
+			if(f != null && f.isAnnotationPresent(annotationClass)){
+				return f;
+			}
+		}catch(NoSuchFieldException e){
+			if(entityClass.getSuperclass() != null && entityClass.getSuperclass() != Object.class){
+				return getField(entityClass.getSuperclass(), fieldname, true);
+			}else{
+				return null;
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * 得到给写的类或其父类中声明的方法
 	 * @param entityClass
