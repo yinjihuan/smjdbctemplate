@@ -177,8 +177,7 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 	public int[] batchSaveByContainsFields(Class<?> entityClass, List<?> entitys, String... containsFields) {
 		Assert.notNull(entitys);
 		List<Object[]> allValues = new ArrayList<Object[]>();
-		String[] fieldNames = BeanUtils.getContainsFieldNames(entityClass, "", containsFields);
-		return doBatchSave(entityClass, entitys, allValues, fieldNames);
+		return doBatchSave(entityClass, entitys, allValues, containsFields);
 	}
 
 	/**
@@ -196,8 +195,7 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 	}
 	
 	public <T> Serializable saveByContainsFields(Class<T> entityClass, Object entity, String... containsFields) {
-		String[] fieldNames = BeanUtils.getContainsFieldNames(entityClass, "", containsFields);
-		return doSave(entityClass, entity, fieldNames);
+		return doSave(entityClass, entity, containsFields);
 	}
 	
 	private int[] doBatchSave(Class<?> entityClass, List<?> entitys, List<Object[]> allValues, String[] fieldNames) {
@@ -314,10 +312,7 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 	public int[] batchUpdateByContainsFields(Class<?> entityClass, List<?> entitys, String pkField, String... containsFields) {
 		Assert.notNull(entitys);
 		List<Object[]> allValues = new ArrayList<Object[]>();
-		Set<String> set = new HashSet<String>(containsFields.length + 1);
-		set.addAll(Arrays.asList(containsFields));
-		String[] fieldNames = BeanUtils.getContainsFieldNames(entityClass, "", set.toArray(new String[set.size()]));
-		return doBatchUpdate(entityClass, entitys, pkField, allValues, fieldNames);
+		return doBatchUpdate(entityClass, entitys, pkField, allValues, containsFields);
 		
 	}
 	
@@ -373,10 +368,7 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 	}
 	
 	public <T> void updateByContainsFields(Class<T> entityClass, Object entity, String pkField, String... containsFields) {
-		Set<String> set = new HashSet<String>(containsFields.length + 1);
-		set.addAll(Arrays.asList(containsFields));
-		String[] fieldNames = BeanUtils.getContainsFieldNames(entityClass, "", set.toArray(new String[set.size()]));
-		doUpdateByContainsFields(entityClass, entity, pkField, fieldNames);
+		doUpdateByContainsFields(entityClass, entity, pkField, containsFields);
 	}
 	
 	private <T> void doUpdateByContainsFields(Class<T> entityClass, Object entity, String pkField, String[] fieldNames) {

@@ -24,7 +24,7 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.1.7</version>
-			<scope>compile</scope>  
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
@@ -37,12 +37,25 @@
 			<artifactId>spring-context</artifactId>
 			<version>4.3.3.RELEASE</version>
 		</dependency>
-		
+
 		<!-- guava -->
 		<dependency>
-           <groupId>com.google.guava</groupId>
-           <artifactId>guava</artifactId>
-           <version>18.0</version>
-      		</dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
