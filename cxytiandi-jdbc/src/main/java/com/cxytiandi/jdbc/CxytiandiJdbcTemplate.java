@@ -207,7 +207,7 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 		@SuppressWarnings("unchecked")
 		List<Object> list = (List<Object>) entitys;
 		for (Object entity : list) {
-			final Object[] values = getSaveValues(entityClass, entity, fieldNames);
+			final Object[] values = getSaveValues(entityClass, entity, fieldNames, null);
 			printSqlLog(sql.toString(), values);
 			allValues.add(values);
 		}
@@ -215,12 +215,12 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 	}
 	
 	private <T> Serializable doSave(Class<T> entityClass, Object entity, String[] fieldNames) {
-		setAutoId(entityClass, entity, fieldNames);
+		Long autoId = setAutoId(entityClass, entity, fieldNames, null);
 		String[] paramPlaceHolders = new String[fieldNames.length];
 		Arrays.fill(paramPlaceHolders, 0, paramPlaceHolders.length, "?");
 		final StringBuilder sql = getSaveSql(entityClass, fieldNames, paramPlaceHolders);
 		
-		final Object[] values = getSaveValues(entityClass, entity, fieldNames);
+		final Object[] values = getSaveValues(entityClass, entity, fieldNames, autoId);
 		printSqlLog(sql.toString(), values);
 		if(supportsGeneratedKey()){
 			return super.execute(new ConnectionCallback<Serializable>() {
@@ -241,6 +241,9 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 								pk = (Serializable) rs.getObject(1);
 							}
 						}
+						if (autoId != null) {
+							return autoId;
+						}
 						return pk;
 					}catch(Exception e){
 						throw new RuntimeException(e.getMessage(), e);
@@ -258,23 +261,28 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 		}
 	}
 
-	private <T> void setAutoId(Class<T> entityClass, Object entity, String[] fieldNames) {
+	private <T> Long setAutoId(Class<T> entityClass, Object entity, String[] fieldNames, Long autoId) {
 		try {
 			Field field = ReflectUtils.getField(entityClass, fieldNames, AutoId.class);
 			if (field != null) {
-				if (field.getType().getSimpleName().equals("String")) {
-					ReflectUtils.callSetMethod(field.getName(), String.class, entity, keyGenerator.generateKey().toString());
-				} else {
-					ReflectUtils.callSetMethod(field.getName(), Long.class, entity, keyGenerator.generateKey());
+				if (autoId == null) {
+					autoId = keyGenerator.generateKey().longValue();
 				}
+				if (field.getType().getSimpleName().equals("String")) {
+					ReflectUtils.callSetMethod(field.getName(), String.class, entity, autoId.toString());
+				} else {
+					ReflectUtils.callSetMethod(field.getName(), Long.class, entity, autoId);
+				}
+				return autoId.longValue();
 			}
 		} catch (NoSuchFieldException e) {
 			logger.error("设置分布式主键ID异常", e);
 		}
+		return null;
 	}
 
-	private <T> Object[] getSaveValues(Class<T> entityClass, Object entity, String[] fieldNames) {
-		setAutoId(entityClass, entity, fieldNames);
+	private <T> Object[] getSaveValues(Class<T> entityClass, Object entity, String[] fieldNames, Long autoId) {
+		setAutoId(entityClass, entity, fieldNames, autoId);
 		final Object[] values = new Object[fieldNames.length];
 		for(int i=0; i<fieldNames.length; i++) {
 			String fieldName = fieldNames[i];
