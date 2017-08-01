@@ -367,8 +367,33 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 		doUpdateByContainsFields(entityClass, entity, pkField, fieldNames);
 	}
 	
-	public <T> void updateByContainsFields(Class<T> entityClass, Object entity, String pkField, String... containsFields) {
+	public <T> void updateByContainsFields(Class<T> entityClass, Object entity, String pkField, String[] containsFields) {
 		doUpdateByContainsFields(entityClass, entity, pkField, containsFields);
+	}
+	
+	public <T> void updateByContainsFields(Class<T> entityClass, String[] containsFields, String[] params, Object[] values) {
+		doUpdateByContainsFields(entityClass, containsFields, params, values);
+	}
+	
+	public <T> void updateByContainsFields(Class<T> entityClass, String[] containsFields, String param, Object[] values) {
+		doUpdateByContainsFields(entityClass, containsFields, new String[] { param }, values);
+	}
+
+	private <T> void doUpdateByContainsFields(Class<T> entityClass, String[] containsFields, String[] params, Object[] values) {
+		String tableName = getTableName(entityClass);
+		StringBuilder sql = new StringBuilder("update ").append(tableName);
+	
+		for(int i=0; i<containsFields.length; i++) {
+			String fieldName = containsFields[i];
+			if(i==0)sql.append(" set "); else sql.append(", ");
+			sql.append(fieldName+" = ?");
+		}
+		sql.append(" where");
+		for (int i = 0; i < params.length; i++) {
+			sql.append(" ").append(params[i]).append(" = ?").append(" and ");
+		}
+		sql.delete(sql.lastIndexOf("and"), sql.length());
+		execute(sql.toString(), values);
 	}
 	
 	private <T> void doUpdateByContainsFields(Class<T> entityClass, Object entity, String pkField, String[] fieldNames) {
@@ -411,7 +436,14 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 		execute(sql, values);
 	}
 	
+	public <T> void deleteAll(Class<T> entityClass) {
+		String tableName = getTableName(entityClass);
+		StringBuilder sql = new StringBuilder(Constants.DELETE_SQL).append(tableName).append(Constants.ONE_EQ_ONE_SQL);
+		execute(sql.toString());
+	}
+	
 	public <T> void deleteByParams(Class<T> entityClass, String[] params, Object[] values) {
+		if (params == null || params.length == 0) throw new RuntimeException("params必须有值");
 		String tableName = getTableName(entityClass);
 		StringBuilder sql = new StringBuilder(Constants.DELETE_SQL).append(tableName)
 				.append(Constants.ONE_EQ_ONE_SQL);

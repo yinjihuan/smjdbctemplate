@@ -29,6 +29,11 @@ public class PageBean<E> {
 		return (int)(start + limit) / limit;
 	}
 	
+	public static int calcPages(long totalRecords, int limit) {
+		return (int) totalRecords / limit 
+				+ (totalRecords % limit > 0 ? 1 : 0);
+	}
+	
 	public PageBean(){
 		
 	}
