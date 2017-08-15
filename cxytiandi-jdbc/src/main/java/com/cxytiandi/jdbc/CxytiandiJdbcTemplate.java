@@ -63,6 +63,7 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 					}
 					com.cxytiandi.jdbc.annotation.Field cf = field.getAnnotation(com.cxytiandi.jdbc.annotation.Field.class);
 					CacheData.put(className + "." + cf.value() , field.getName());
+					//System.out.println("CacheData.put(\""+className + "." + cf.value()+"\", \""+field.getName()+"\");");
 				}
 			}
 		} catch (Exception e) {
@@ -96,7 +97,9 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 				.append(tableName)
 				.append(Constants.ONE_EQ_ONE_SQL);
 		for (int i = 0; i < params.length; i++) {
-			sql.append(" and "+params[i]+"= ?");
+			if (values[i] != null) {
+				sql.append(" and "+params[i]+"= ?");
+			}
 		}
 		return doQueryCountResult(sql.toString(), values);
 	}
