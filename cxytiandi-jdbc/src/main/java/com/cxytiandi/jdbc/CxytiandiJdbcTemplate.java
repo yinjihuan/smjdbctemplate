@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Array;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -776,6 +777,8 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 			ps.setFloat(index, (Float)value);
 		}else if(byte.class.isAssignableFrom(type)){
 			ps.setByte(index, (Byte)value);
+		}else if(Blob.class.isAssignableFrom(type)){
+			ps.setBlob(index, (Blob)value);
 		}else if(type.isArray()){
 			ps.setArray(index, (Array)value);
 		}else if(value instanceof java.sql.Timestamp){
