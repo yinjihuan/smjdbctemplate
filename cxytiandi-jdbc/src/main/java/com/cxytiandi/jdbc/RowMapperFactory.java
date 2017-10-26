@@ -65,7 +65,9 @@ public class RowMapperFactory {
 					int columnCount = rsmd.getColumnCount();
 					
 					for(int i=0; i<columnCount; i++){
-						String name = rsmd.getColumnName(i+1);
+						//String name = rsmd.getColumnName(i+1);
+						//getColumnName 拿不到别名
+						String name = rsmd.getColumnLabel(i+1);
 						logger.debug("DBColumnName:"+name+"\tDBType:"+rsmd.getColumnClassName(i+1));
 						
 						Object[] nameAndType = getFieldNameByColumnName(name);
