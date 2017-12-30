@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CacheData {
 	/**
 	 * PO中属性名称与数据库字段名称的缓存映射信息
-	 * key:com.fangjia.model.ld.po.LouDong.ld_num
+	 * key:com.cxytiandi.model.ld.po.LouDong.ld_num
 	 * value:ldNum
 	 */
 	private static Map<String, String> fieldNameMappingMap = new ConcurrentHashMap<String, String>();
