@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Array;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -63,6 +64,7 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 					}
 					com.cxytiandi.jdbc.annotation.Field cf = field.getAnnotation(com.cxytiandi.jdbc.annotation.Field.class);
 					CacheData.put(className + "." + cf.value() , field.getName());
+					//System.out.println("CacheData.put(\""+className + "." + cf.value()+"\", \""+field.getName()+"\");");
 				}
 			}
 		} catch (Exception e) {
@@ -96,7 +98,9 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 				.append(tableName)
 				.append(Constants.ONE_EQ_ONE_SQL);
 		for (int i = 0; i < params.length; i++) {
-			sql.append(" and "+params[i]+"= ?");
+			if (values[i] != null) {
+				sql.append(" and "+params[i]+"= ?");
+			}
 		}
 		return doQueryCountResult(sql.toString(), values);
 	}
@@ -367,8 +371,33 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 		doUpdateByContainsFields(entityClass, entity, pkField, fieldNames);
 	}
 	
-	public <T> void updateByContainsFields(Class<T> entityClass, Object entity, String pkField, String... containsFields) {
+	public <T> void updateByContainsFields(Class<T> entityClass, Object entity, String pkField, String[] containsFields) {
 		doUpdateByContainsFields(entityClass, entity, pkField, containsFields);
+	}
+	
+	public <T> void updateByContainsFields(Class<T> entityClass, String[] containsFields, String[] params, Object[] values) {
+		doUpdateByContainsFields(entityClass, containsFields, params, values);
+	}
+	
+	public <T> void updateByContainsFields(Class<T> entityClass, String[] containsFields, String param, Object[] values) {
+		doUpdateByContainsFields(entityClass, containsFields, new String[] { param }, values);
+	}
+
+	private <T> void doUpdateByContainsFields(Class<T> entityClass, String[] containsFields, String[] params, Object[] values) {
+		String tableName = getTableName(entityClass);
+		StringBuilder sql = new StringBuilder("update ").append(tableName);
+	
+		for(int i=0; i<containsFields.length; i++) {
+			String fieldName = containsFields[i];
+			if(i==0)sql.append(" set "); else sql.append(", ");
+			sql.append(fieldName+" = ?");
+		}
+		sql.append(" where");
+		for (int i = 0; i < params.length; i++) {
+			sql.append(" ").append(params[i]).append(" = ?").append(" and ");
+		}
+		sql.delete(sql.lastIndexOf("and"), sql.length());
+		execute(sql.toString(), values);
 	}
 	
 	private <T> void doUpdateByContainsFields(Class<T> entityClass, Object entity, String pkField, String[] fieldNames) {
@@ -411,7 +440,14 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 		execute(sql, values);
 	}
 	
+	public <T> void deleteAll(Class<T> entityClass) {
+		String tableName = getTableName(entityClass);
+		StringBuilder sql = new StringBuilder(Constants.DELETE_SQL).append(tableName).append(Constants.ONE_EQ_ONE_SQL);
+		execute(sql.toString());
+	}
+	
 	public <T> void deleteByParams(Class<T> entityClass, String[] params, Object[] values) {
+		if (params == null || params.length == 0) throw new RuntimeException("params必须有值");
 		String tableName = getTableName(entityClass);
 		StringBuilder sql = new StringBuilder(Constants.DELETE_SQL).append(tableName)
 				.append(Constants.ONE_EQ_ONE_SQL);
@@ -741,6 +777,8 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 			ps.setFloat(index, (Float)value);
 		}else if(byte.class.isAssignableFrom(type)){
 			ps.setByte(index, (Byte)value);
+		}else if(Blob.class.isAssignableFrom(type)){
+			ps.setBlob(index, (Blob)value);
 		}else if(type.isArray()){
 			ps.setArray(index, (Array)value);
 		}else if(value instanceof java.sql.Timestamp){

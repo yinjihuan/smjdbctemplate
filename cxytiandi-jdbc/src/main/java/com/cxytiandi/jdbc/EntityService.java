@@ -94,8 +94,16 @@ public abstract class EntityService<T> {
 		jdbcTemplate.update(entityClass, entity, pkField, excludeFields);
 	}
 	
-	public void updateByContainsFields(Object entity, String pkField, String... containsFields) {
+	public void updateByContainsFields(Object entity, String pkField, String[] containsFields) {
 		jdbcTemplate.updateByContainsFields(entityClass, entity, pkField, containsFields);
+	}
+	
+	public void updateByContainsFields(String[] containsFields, String[] params, Object[] values) {
+		jdbcTemplate.updateByContainsFields(entityClass, containsFields, params, values);
+	}
+	
+	public void updateByContainsFields(String[] containsFields, String param, Object[] values) {
+		jdbcTemplate.updateByContainsFields(entityClass, containsFields, param, values);
 	}
 	
 	public void deleteById(String pkField, Object pk) {
@@ -104,6 +112,10 @@ public abstract class EntityService<T> {
 	
 	public void deleteById(String sql, Object...values) {
 		jdbcTemplate.deleteById(sql, values);
+	}
+	
+	public void deleteAll() {
+		jdbcTemplate.deleteAll(entityClass);
 	}
 	
 	public void deleteByParams(String[] params, Object[] values) {
