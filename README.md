@@ -345,6 +345,26 @@ private CxytiandiJdbcTemplate jdbcTemplate;
 @Field(value="id", desc="主键ID")
 private String id;
 ```
+## 不用注解做字段名映射怎么使用？
+通过@Field注解方式可以允许数据库中的字段名称跟实体类的名称不一致，通过注解的方式来映射，如果你觉得太麻烦了，那么你可以按下面的方式使用：
+
+```
+CREATE TABLE `Order`(
+  id bigint(64) not null,
+  shopName varchar(20) not null,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+
+实体类定义,只需要类名跟表名一致，属性名和字段名一致：
+
+```
+public class Order {
+    private Long id;
+    private String shopName;
+    // get set...
+}
+```
 
 # 作者
 - 尹吉欢 1304489315@qq.com
