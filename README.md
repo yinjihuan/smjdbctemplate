@@ -329,6 +329,8 @@ public class BeanConfig {
 </bean>
 ```
 
+> 注意：在配置CxytiandiJdbcTemplate的时候也可以不用传入对应的包信息，如果没有传入包信息，smjdbc在使用的时候会根据查询传入的实体类动态获取映射信息，推荐大家配置时传入包信息。
+
 ## 除了继承EntityService还能用什么办法使用？
 大家完全可以直接注入JdbcTemplate来操作数据库，我这里只是对JdbcTemplate进行了扩展
 
