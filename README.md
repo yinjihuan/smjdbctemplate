@@ -365,6 +365,29 @@ public class Order {
     // get set...
 }
 ```
+## 连表查询的结果如何定义对应的实体类？
+sql语句：select tab1.name,tab2.shop_name from tab1,tab2
+
+查询出的结果肯定是name,shop_name 2个字段，这种你可以直接定义一个类，然后写上这2个字段对应的属性即可，这边有下划线定义的字段，所以我们在实体类中需要用注解来映射
+
+
+```
+public class Order {
+    private Long name;
+    @Field(value="shop_name", desc="商品名称")
+    private String shopName;
+    // get set...
+}
+```
+如果不想使用注解那就在sql语句中为字段添加别名：select tab1.name,tab2.shop_name as shopName from tab1,tab2
+
+```
+public class Order {
+    private Long name;
+    private String shopName;
+    // get set...
+}
+```
 
 # 作者
 - 尹吉欢 1304489315@qq.com
