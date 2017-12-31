@@ -1,11 +1,11 @@
 # smjdbctemplate 基于 spring jdbctemplate 做的升级版
-大家自己下载源码编译安装到本地仓库即可使用
+大家自己下载源码编译安装到本地仓库即可使用,当前版本号为1.0.2
 ```
 <!-- jdbc orm -->
 <dependency>
   <groupId>com.cxytiandi</groupId>
   <artifactId>cxytiandi-jdbc</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.2</version>
 </dependency>
 ```
 
@@ -299,9 +299,35 @@ public class BeanConfig {
 	
 }
 ```
-上面构造方法中传的com.fangjia.model.ld.po是你数据表对应的PO实体类所在的包路径，就放一个包下，不要放多个
-
+上面构造方法中传的com.fangjia.model.ld.po是你数据表对应的PO实体类所在的包路径，推荐放一个包下，如果在多个包下可以配置多个包的路径
+```
+@Configuration
+public class BeanConfig {
+	
+	/**
+	 * JDBC
+	 * @return
+	 */
+	@Bean(autowire=Autowire.BY_NAME)
+	public CxytiandiJdbcTemplate cxytiandiJdbcTemplate() {
+		return new CxytiandiJdbcTemplate("com.fangjia.model.ld.po", "com.fangjia.model.user.po");
+	}
+	
+}
+```
 如果是用xml的方式，那就用&lt; bean>标签配置即可。
+```
+<!-- 增强版JdbcTemplate -->
+<bean id="cxytiandiJdbcTemplate" class="com.cxytiandi.jdbc.CxytiandiJdbcTemplate">
+   <property name="dataSource" ref="dataSource"/>
+   <constructor-arg>
+      <array>
+         <value>com.fangjia.model.ld.po</value>
+         <value>com.fangjia.model.user.po</value>
+      </array>
+   </constructor-arg>
+</bean>
+```
 
 ## 除了继承EntityService还能用什么办法使用？
 大家完全可以直接注入JdbcTemplate来操作数据库，我这里只是对JdbcTemplate进行了扩展
@@ -313,7 +339,7 @@ public class BeanConfig {
 private CxytiandiJdbcTemplate jdbcTemplate;
 ```
 ## 支持分布式主键ID的自动生成怎么使用？
-只需要在对应的注解字段上加上@AutoId注解即可，注意此字段的类型必须为String或者Long, 需要关闭数据库的自增功能
+只需要在对应的注解字段上加上@AutoId注解即可，注意此字段的类型必须为String或者Long, 需要关闭数据库的自增功能,ID算法用的是[ShardingJdbc](http://shardingjdbc.io/)中的ID算法，在分布式环境下并发会出现id相同的问题，需要为每个节点配置不同的wordid即可，通过-Dsharding-jdbc.default.key.generator.worker.id=wordid设置
 ```
 @AutoId
 @Field(value="id", desc="主键ID")
