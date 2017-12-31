@@ -31,8 +31,8 @@ import com.cxytiandi.jdbc.keygen.KeyGenerator;
 import com.cxytiandi.jdbc.keygen.KeyGeneratorFactory;
 import com.cxytiandi.jdbc.util.ArrayUtils;
 import com.cxytiandi.jdbc.util.BeanUtils;
+import com.cxytiandi.jdbc.util.ClassReadUtils;
 import com.cxytiandi.jdbc.util.ClassUtils;
-import com.cxytiandi.jdbc.util.ClasspathPackageScannerUtils;
 import com.cxytiandi.jdbc.util.ReflectUtils;
 
 /**
@@ -46,31 +46,40 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 	private static final Logger logger = LoggerFactory.getLogger(CxytiandiJdbcTemplate.class);
 	private KeyGenerator keyGenerator = KeyGeneratorFactory.createKeyGenerator(DefaultKeyGenerator.class);
 	
-	public CxytiandiJdbcTemplate(String poPackage) {
-		try {
-			List<String> classList = new ClasspathPackageScannerUtils(poPackage).getFullyQualifiedClassNameList();
-			for (String className : classList) {
-				Class<?> clazz = Class.forName(className);
-				if(!clazz.isAnnotationPresent(TableName.class)){
-					throw new NullPointerException("数据表对应的实体类必须加TableName注解:" + className);
-				}
-				Field[] fields = clazz.getDeclaredFields();
-				for (Field field : fields) {
-					if (Modifier.isStatic(field.getModifiers())) {
-						continue;
+	public CxytiandiJdbcTemplate() {
+		
+	}
+	
+	public CxytiandiJdbcTemplate(String...poPackages) {
+		for (String pck : poPackages) {
+			try {
+				Set<Class<?>> classList = ClassReadUtils.getClassFromPackagePath(pck);
+				for (Class<?> clazz : classList) {
+					String className = clazz.getName();
+					// 存储类信息，用于后面RowMapperFactory中判断是否已经存储过映射信息
+					CacheData.put(className, "");
+					Field[] fields = clazz.getDeclaredFields();
+					for (Field field : fields) {
+						if (Modifier.isStatic(field.getModifiers())) {
+							continue;
+						}
+						
+						if (field.isAnnotationPresent(com.cxytiandi.jdbc.annotation.Field.class)) {
+							com.cxytiandi.jdbc.annotation.Field cf = field.getAnnotation(com.cxytiandi.jdbc.annotation.Field.class);
+							CacheData.put(className + "." + cf.value() , field.getName());
+						} else {
+							CacheData.put(className + "." + field.getName() , field.getName());
+						}
+						//System.out.println("CacheData.put(\""+className + "." + cf.value()+"\", \""+field.getName()+"\");");
 					}
-					if (!field.isAnnotationPresent(com.cxytiandi.jdbc.annotation.Field.class)) {
-						throw new NullPointerException("数据表对应的实体类的属性必须加Field注解：" + className + "." + field.getName());
-					}
-					com.cxytiandi.jdbc.annotation.Field cf = field.getAnnotation(com.cxytiandi.jdbc.annotation.Field.class);
-					CacheData.put(className + "." + cf.value() , field.getName());
-					//System.out.println("CacheData.put(\""+className + "." + cf.value()+"\", \""+field.getName()+"\");");
 				}
+			} catch (Exception e) {
+				logger.error("扫描" + pck + "中的PO异常", e);
+				throw new RuntimeException(e);
 			}
-		} catch (Exception e) {
-			logger.error("扫描" + poPackage + "中的PO异常", e);
-			throw new RuntimeException(e);
 		}
+		
+		
 	}
 	
 	public long count(Class<?> entityClass) {
@@ -807,15 +816,28 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 	
 	private String getTableName(Class<?> entityClass) {
 		Assert.notNull(entityClass);
-		return entityClass.getAnnotation(TableName.class).value();
+		if (entityClass.isAnnotationPresent(TableName.class)) {
+			return entityClass.getAnnotation(TableName.class).value();
+		}
+		return entityClass.getSimpleName();
 	}
 	
 	private void printSqlLog(String sql, Object... values) {
+		if (System.getProperty("cxytiandi.show.sql") != null) {
+			System.out.println("execute sql:" + sql);
+		}
 		logger.debug("execute sql:" + sql);
 		StringBuffer p = new StringBuffer();
 		if (values != null) {
 			p.append(ArrayUtils.join(values, "   "));
 		}
+		if (System.getProperty("cxytiandi.show.sql") != null) {
+			System.out.println("execute sql params:" + p.toString());
+		}
 		logger.debug("execute sql params:" + p.toString());
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(Orders.class.getSimpleName());
 	}
 }

@@ -1,6 +1,7 @@
 package com.cxytiandi.jdbc;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -33,7 +34,6 @@ public class RowMapperFactory {
 		
 	}
 	
-	@Deprecated
 	public static <T> RowMapper<T> getRowMapper(Class<T> entityClass, String[] excludeFields){
 		
 		return new RowMapperImpl<T>(entityClass, excludeFields);
@@ -49,6 +49,27 @@ public class RowMapperFactory {
 		public RowMapperImpl(Class<T> entityClass, String[] excludeFields){
 			this.entityClass = entityClass;
 			this.excludeFields = excludeFields;
+			// 第一次使用初始换映射关系，或者配置CxytiandiJdbcTemplate时指定po对应的包进行映射
+			String className = entityClass.getName();
+			if (CacheData.get(className) == null) {
+				CacheData.put(className, "");
+				Field[] fields = entityClass.getDeclaredFields();
+				for (Field field : fields) {
+					if (Modifier.isStatic(field.getModifiers())) {
+						continue;
+					}
+					
+					if (field.isAnnotationPresent(com.cxytiandi.jdbc.annotation.Field.class)) {
+						com.cxytiandi.jdbc.annotation.Field cf = field.getAnnotation(com.cxytiandi.jdbc.annotation.Field.class);
+						CacheData.put(className + "." + cf.value() , field.getName());
+					} else {
+						CacheData.put(className + "." + field.getName() , field.getName());
+					}
+					
+				}
+				
+			}
+			
 		}
 
 		public T mapRow(ResultSet rs, int index) throws SQLException {
