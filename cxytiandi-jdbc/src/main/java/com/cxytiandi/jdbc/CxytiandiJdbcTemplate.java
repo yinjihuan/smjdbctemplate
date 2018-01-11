@@ -837,6 +837,23 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 		logger.debug("execute sql params:" + p.toString());
 	}
 	
+	/**
+	 * 根据当前连接的数据库生成库中所有表的PO实体类<br>
+	 * 获取Table的Comment放在类上面，默认是获取不到的，需要数据库连接加上useInformationSchema=true才可以
+	 * @param pack	 PO类的包名（com.cxytiandi.po）
+	 * @param author PO类的创建者（yinjihuan）
+	 * @param savePath 保存的路径（E:\\PO）
+	 */
+	public void generatePoClass(String pack, String author, String savePath) {
+		try {
+			Connection connection = super.getDataSource().getConnection();
+			new GeneratePoJavaCode().generate(connection, pack, author, savePath);
+		} catch (SQLException e) {
+			logger.error("生成实体类异常", e);
+		}
+		
+	}
+	
 	public static void main(String[] args) {
 		System.out.println(Orders.class.getSimpleName());
 	}
