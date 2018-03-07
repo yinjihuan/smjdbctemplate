@@ -394,6 +394,15 @@ public class Order {
 ## 为何要封装？
 有很多人问为什么要封装一个，为什么不直接用jpa或者mybatis,这个问题我是这么看的，框架这东西很多，每个人可以根据自己的喜好来使用，可以用开源的，也可以自己封装，其实我这也不算重复造轮子，因为JdbcTemplate已经封装了很好用了，我只是在上面做了一些小小的扩展而已，也没有说要去跟mybatis这些框架去做比较，我个人就是喜欢直接在代码中写SQL,JdbcTemplate符合我的开发风格，就这么简单。
 
+## 如何快速生成表对应的PO类？
+当表比较多的时候，每个表都要对应一个实体类，手动去创建虽然简单，但是也耗费时间，在CxytiandiJdbcTemplate中提供了一个generatePoClass的方法，可以基于当前程序连接的数据库生成数据库中所有表的PO类，生成完成之后直接复制到项目中即可使用。大部分常用的类型生成应该是支持的，如果有些生成不了，自己可以手动改下。
+```
+super.getJdbcTemplate().generatePoClass("com.cxytiandi.po", "yinjihuan", "/Users/Yinjihuan/Downloads/java");
+```
+- 第一个参数是PO类的包名
+- 第二个参数是PO类的创建者
+- 第三个参数是PO类保存的路径
+
 # 作者
 - 尹吉欢 1304489315@qq.com
 - 博客 http://cxytiandi.com/blogs/yinjihuan
