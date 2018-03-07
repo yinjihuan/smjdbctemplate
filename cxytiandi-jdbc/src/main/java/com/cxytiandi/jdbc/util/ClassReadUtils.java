@@ -1,6 +1,7 @@
 package com.cxytiandi.jdbc.util;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -66,7 +67,13 @@ public class ClassReadUtils {
 		}
 
 		// 过滤获取目录，or class文件
-		File[] dirfiles = dir.listFiles(pathname -> pathname.isDirectory() || pathname.getName().endsWith("class"));
+		File[] dirfiles = dir.listFiles(new FilenameFilter() {
+			
+			public boolean accept(File dir, String name) {
+				return dir.isDirectory() || name.endsWith("class");
+			}
+		});
+
 
 		if (dirfiles == null || dirfiles.length == 0) {
 			return;
