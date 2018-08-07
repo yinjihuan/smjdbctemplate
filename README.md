@@ -1,11 +1,21 @@
 # smjdbctemplate 基于 spring jdbctemplate 做的升级版
-大家自己下载源码编译安装到本地仓库即可使用,当前版本号为1.0.2
+pom中配置仓库地址
+
+```
+<repositories>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+```
+增加依赖
 ```
 <!-- jdbc orm -->
 <dependency>
-  <groupId>com.cxytiandi</groupId>
-  <artifactId>cxytiandi-jdbc</artifactId>
-  <version>1.0.2</version>
+  <groupId>com.github.yinjihuan</groupId>
+  <artifactId>smjdbctemplate</artifactId>
+  <version>1.1</version>
 </dependency>
 ```
 
