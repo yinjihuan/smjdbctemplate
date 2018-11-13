@@ -805,10 +805,10 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 		if (values == null) {
 			return new Object[]{};
 		}
-		List<Object> list = new ArrayList<Object>(Arrays.asList(values));
+		List<Object> list = new ArrayList<Object>();
 		for (int i = 0; i < values.length; i++) {
-			if (values[i] == null) {
-				list.remove(i);
+			if (values[i] != null && !values[i].toString().equals("")) {
+				list.add(values[i]);
 			}
 		}
 		return list.toArray();
