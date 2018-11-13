@@ -107,7 +107,7 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 				.append(tableName)
 				.append(Constants.ONE_EQ_ONE_SQL);
 		for (int i = 0; i < params.length; i++) {
-			if (values[i] != null) {
+			if (values[i] != null && !values[i].toString().equals("")) {
 				sql.append(" and "+params[i]+"= ?");
 			}
 		}
@@ -540,7 +540,7 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 				.append(Constants.ONE_EQ_ONE_SQL);
 		if (params != null) {
 			for (int i = 0; i < params.length; i++) {
-				if (values[i] !=null) {
+				if (values[i] !=null && !values[i].toString().equals("")) {
 					sql.append(" and "+params[i]+"= ?");
 				}
 			}
@@ -854,7 +854,4 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 		
 	}
 	
-	public static void main(String[] args) {
-		System.out.println(Orders.class.getSimpleName());
-	}
 }
