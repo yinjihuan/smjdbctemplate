@@ -738,7 +738,9 @@ public class CxytiandiJdbcTemplate extends JdbcTemplate {
 						setValue(ps, subValues[i], i+1);
 					}
 				}else{
-					setValue(ps, value, 1);
+					for(int i=0; i<values.length; i++){
+						setValue(ps, values[i], i+1);
+					}
 				}
 			}
 		});
